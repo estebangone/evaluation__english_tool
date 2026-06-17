@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {  
+import { 
   BookOpen, 
   Award, 
   TrendingUp, 
@@ -905,6 +905,12 @@ export default function App() {
     }
   };
 
+  const handleLogout = () => {
+    setUser({ name: '', email: '', completedTests: [] });
+    setCurrentScreen('landing');
+    alertModal("Sesión cerrada correctamente.", "info");
+  };
+
   const currentTest = user.completedTests[0] || null;
 
   // Asegurar que solo busquemos si la rama del banco de preguntas actual es un Array válido
@@ -937,6 +943,7 @@ export default function App() {
               </span>
             </div>
 
+            {/* Menú de Escritorio (Desktop) */}
             <div className="hidden md:flex items-center gap-6">
               <button onClick={() => setCurrentScreen('landing')} className={`text-sm font-medium transition-colors hover:text-indigo-400 ${currentScreen === 'landing' ? 'text-indigo-400' : 'text-slate-400'}`}>Inicio</button>
               {user.email && (
@@ -964,7 +971,7 @@ export default function App() {
                     {user.name.charAt(0)}
                   </div>
                   <span className="text-xs font-semibold text-slate-200">{user.name}</span>
-                  <button onClick={() => { setUser({ name:'', email:'', completedTests:[] }); setCurrentScreen('landing'); }} className="text-slate-500 hover:text-red-400 transition-colors ml-1">
+                  <button onClick={handleLogout} className="text-slate-500 hover:text-red-400 transition-colors ml-1">
                     <LogOut className="w-4 h-4" />
                   </button>
                 </div>
@@ -975,6 +982,7 @@ export default function App() {
               )}
             </div>
 
+            {/* Iconos de cabecera móvil */}
             <div className="md:hidden flex items-center gap-4">
               <button 
                 onClick={() => setIsDarkMode(!isDarkMode)} 
@@ -990,18 +998,49 @@ export default function App() {
           </div>
         </div>
 
+        {/* CORRECCIÓN CRÍTICA DE MENÚ MÓVIL: Añadir panel de usuario y botón de salida responsivo */}
         {isMobileMenuOpen && (
-          <div className="md:hidden px-4 pt-2 pb-4 bg-slate-950 border-b border-slate-800 space-y-2">
-            <button onClick={() => { setCurrentScreen('landing'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-900">Inicio</button>
-            {user.email ? (
-              <>
-                <button onClick={() => { setCurrentScreen('dashboard'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-900">Mi Dashboard</button>
-                <button onClick={() => { handleStartFreshTest(); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-3 rounded-lg text-indigo-400 hover:bg-slate-900 font-medium">Nueva Evaluación Adaptativa</button>
-              </>
-            ) : (
-              <button onClick={() => { setAuthMode('login'); setCurrentScreen('auth'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-900">Iniciar Sesión</button>
-            )}
-            <button onClick={() => { setCurrentScreen('settings'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-900">Configuración API Gemini</button>
+          <div className="md:hidden px-4 pt-2 pb-6 bg-slate-950 border-b border-slate-800 space-y-4 animate-fade-in">
+            <div className="space-y-1">
+              <button onClick={() => { setCurrentScreen('landing'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2.5 px-3 rounded-lg text-slate-300 hover:bg-slate-900 font-medium">Inicio</button>
+              {user.email && (
+                <>
+                  <button onClick={() => { setCurrentScreen('dashboard'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2.5 px-3 rounded-lg text-slate-300 hover:bg-slate-900 font-medium">Mi Dashboard</button>
+                  <button onClick={() => { handleStartFreshTest(); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2.5 px-3 rounded-lg text-indigo-400 hover:bg-slate-900 font-bold">Nueva Evaluación Adaptativa</button>
+                </>
+              )}
+              <button onClick={() => { setCurrentScreen('settings'); setIsMobileMenuOpen(false); }} className="block w-full text-left py-2.5 px-3 rounded-lg text-slate-300 hover:bg-slate-900 font-medium">Configuración API Gemini</button>
+            </div>
+
+            <div className="border-t border-slate-800 pt-4">
+              {user.email ? (
+                <div className="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm uppercase">
+                      {user.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-slate-200">{user.name}</div>
+                      <div className="text-xs text-slate-400">{user.email}</div>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} 
+                    className="w-full py-2.5 rounded-xl text-xs font-bold bg-slate-950 border border-red-500/20 hover:border-red-500/40 text-red-400 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Cerrar Sesión</span>
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => { setAuthMode('login'); setCurrentScreen('auth'); setIsMobileMenuOpen(false); }} 
+                  className="w-full py-3 rounded-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm"
+                >
+                  Iniciar Sesión / Registrarse
+                </button>
+              )}
+            </div>
           </div>
         )}
       </nav>
